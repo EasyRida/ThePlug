@@ -1,0 +1,50 @@
+<!-- Previous head section remains the same -->
+<head>
+    <!-- ... other head elements ... -->
+    <script src="{% static 'js/navigation.js' %}" defer></script>
+</head>
+
+<!-- Update the navigation section -->
+<div class="flex space-x-6">
+    <div class="relative">
+        <button data-dropdown="learn-skills" class="nav-link text-gray-600 flex items-center">
+            Learn Skills
+            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <div data-menu="learn-skills" class="nav-dropdown">
+            <a href="{% url 'skills:list' %}?type=learning&category=technology" 
+               class="nav-dropdown-item">Technology</a>
+            <a href="{% url 'skills:list' %}?type=learning&category=business" 
+               class="nav-dropdown-item">Business</a>
+            <a href="{% url 'skills:list' %}?type=learning&category=creative" 
+               class="nav-dropdown-item">Creative Arts</a>
+            <div class="nav-dropdown-divider"></div>
+            <a href="{% url 'skills:list' %}?type=learning" 
+               class="nav-dropdown-item text-primary-600">View All Skills</a>
+        </div>
+    </div>
+    
+    <div class="relative">
+        <button data-dropdown="find-services" class="nav-link text-gray-600 flex items-center">
+            Find Services
+            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <div data-menu="find-services" class="nav-dropdown">
+            <a href="{% url 'skills:list' %}?type=services&category=home" 
+               class="nav-dropdown-item">Home Services</a>
+            <a href="{% url 'skills:list' %}?type=services&category=professional" 
+               class="nav-dropdown-item">Professional</a>
+            <a href="{% url 'skills:list' %}?type=services&category=events" 
+               class="nav-dropdown-item">Events</a>
+            <div class="nav-dropdown-divider"></div>
+            <a href="{% url 'skills:list' %}?type=services" 
+               class="nav-dropdown-item text-primary-600">View All Services</a>
+        </div>
+    </div>
+</div>
+
+<!-- Rest of the template remains the same -->

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Details - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Booking Details
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Details and information about your booking.
+            </p>
+        </div>
+        <div class="border-t border-gray-200">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Skill
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {{ booking.skill.title }}
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Provider
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {{ booking.provider.get_full_name|default:booking.provider.username }}
+                    </dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Status
+                    </dt>
+                    <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                            {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ booking.status|title }}
+                        </span>
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Date & Time
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {{ booking.start_time|date:"M d, Y" }} at {{ booking.start_time|time:"g:i A" }} - {{ booking.end_time|time:"g:i A" }}
+                    </dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Total Amount
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        ${{ booking.total_amount }}
+                    </dd>
+                </div>
+                {% if booking.notes %}
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">
+                        Notes
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {{ booking.notes|linebreaks }}
+                    </dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+        
+        {% if booking.status == 'pending' and user == booking.renter %}
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+            <form method="post" action="{% url 'bookings:cancel' booking.id %}" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Cancel Booking
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if booking.status == 'confirmed' and user == booking.provider %}
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+            <form method="post" action="{% url 'bookings:complete' booking.id %}" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Mark as Completed
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if booking.can_be_reviewed and user == booking.renter %}
+        <div class="px-4 py-5 sm:px-6 border-t border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                Write a Review
+            </h3>
+            <form method="post" action="{% url 'reviews:create' booking.id %}">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Rating</label>
+                        <div class="mt-1">
+                            <select name="rating" class="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Comment</label>
+                        <div class="mt-1">
+                            <textarea name="comment" rows="4" class="form-textarea block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Submit Review
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

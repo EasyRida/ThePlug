@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Review - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+            <div class="px-4 sm:px-0">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">
+                    {% if form.instance.pk %}Edit{% else %}Write{% endif %} Review
+                </h3>
+                <p class="mt-1 text-sm text-gray-600">
+                    Share your experience to help others make informed decisions.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <form method="post">
+                {% csrf_token %}
+                <div class="shadow sm:rounded-md sm:overflow-hidden">
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% if not form.instance.pk %}
+                        <div class="bg-gray-50 px-4 py-5 sm:rounded-lg sm:p-6 mb-6">
+                            <div class="md:grid md:grid-cols-3 md:gap-6">
+                                <div class="md:col-span-1">
+                                    <h3 class="text-lg font-medium leading-6 text-gray-900">Booking Details</h3>
+                                </div>
+                                <div class="mt-5 md:mt-0 md:col-span-2">
+                                    <div class="grid grid-cols-6 gap-6">
+                                        <div class="col-span-6">
+                                            <dt class="text-sm font-medium text-gray-500">Skill</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">{{ booking.skill.title }}</dd>
+                                        </div>
+                                        <div class="col-span-6">
+                                            <dt class="text-sm font-medium text-gray-500">Provider</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">
+                                                {{ booking.provider.get_full_name|default:booking.provider.username }}
+                                            </dd>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ field.label }}
+                            </label>
+                            <div class="mt-1">
+                                {{ field }}
+                            </div>
+                            {% if field.help_text %}
+                            <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+                            {% endif %}
+                            {% if field.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <button type="submit" 
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            {% if form.instance.pk %}Update{% else %}Submit{% endif %} Review
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

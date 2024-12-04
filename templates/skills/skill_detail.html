@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ skill.title }} - SkillRentals{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="bg-white">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div class="lg:grid lg:grid-cols-2 lg:gap-x-8">
+            <!-- Image gallery -->
+            <div class="lg:max-w-lg lg:self-end">
+                <div class="mt-6 max-w-2xl mx-auto sm:px-6 lg:max-w-none lg:px-0">
+                    <div class="grid grid-cols-3 gap-3">
+                        {% if skill.images.all %}
+                            {% for image in skill.images.all %}
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img src="{{ image.image.url }}" alt="{{ skill.title }}" class="w-full h-full object-center object-cover">
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-span-3 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skill details -->
+            <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">{{ skill.title }}</h1>
+                
+                <div class="mt-3">
+                    <h2 class="sr-only">Skill information</h2>
+                    <p class="text-3xl text-gray-900">R{{ skill.hourly_rate }}/hr</p>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="sr-only">Description</h3>
+                    <div class="text-base text-gray-700 space-y-6">
+                        {{ skill.description|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <div class="flex items-center">
+                        {% if skill.provider.profile_picture and skill.provider.profile_picture.url %}
+                            <img src="{{ skill.provider.profile_picture.url }}" 
+                                 alt="{{ skill.provider.get_full_name|default:skill.provider.username }}" 
+                                 class="w-12 h-12 rounded-full object-cover">
+                        {% else %}
+                            <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white text-lg">
+                                {{ skill.provider.get_initials|default:skill.provider.email.0|upper }}
+                            </div>
+                        {% endif %}
+                        <div class="ml-4">
+                            <h4 class="text-lg font-bold">{{ skill.provider.get_full_name|default:skill.provider.username }}</h4>
+                            <p class="text-gray-600">
+                                {{ skill.location }}
+                                {% if skill.is_remote %}
+                                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Remote Available
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex sm:flex-col1">
+                    {% if user.is_authenticated and user != skill.provider %}
+                    <button type="button" 
+                            onclick="openBookingModal()"
+                            class="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:w-full">
+                        Book Now
+                    </button>
+                    {% endif %}
+
+                    {% if user == skill.provider %}
+                    <a href="{% url 'skills:update' skill.id %}" 
+                       class="max-w-xs flex-1 bg-gray-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:w-full">
+                        Edit Skill
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Reviews -->
+                <div class="mt-10">
+                    <h3 class="text-lg font-medium text-gray-900">Reviews</h3>
+                    <div class="mt-6 border-t border-gray-200 pt-6">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <div class="flex space-x-4 text-sm text-gray-500">
+                                <div class="flex-none py-10">
+                                    {% if review.reviewer.profile_picture and review.reviewer.profile_picture.url %}
+                                        <img src="{{ review.reviewer.profile_picture.url }}" 
+                                             alt="{{ review.reviewer.get_full_name|default:review.reviewer.username }}" 
+                                             class="w-10 h-10 rounded-full object-cover">
+                                    {% else %}
+                                        <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                                            {{ review.reviewer.get_initials|default:review.reviewer.email.0|upper }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="py-10">
+                                    <h3 class="font-medium text-gray-900">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</h3>
+                                    <p class="sr-only">{{ review.rating }} out of 5 stars</p>
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                        <svg class="{% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %} h-5 w-5 flex-shrink-0" 
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        {% endfor %}
+                                    </div>
+                                    <p class="mt-4">{{ review.comment }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="py-6 text-gray-500">No reviews yet</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div id="bookingModal" class="fixed inset-0 z-10 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div class="absolute top-0 right-0 pt-4 pr-4">
+                <button type="button" 
+                        onclick="closeBookingModal()"
+                        class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <span class="sr-only">Close</span>
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sm:flex sm:items-start">
+                <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Book Session with {{ skill.provider.get_full_name|default:skill.provider.username }}
+                    </h3>
+
+                    <form id="bookingForm" action="{% url 'bookings:create' skill.id %}" method="post" class="mt-6 space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Date Selection -->
+                        <div>
+                            <label for="booking-date" class="block text-sm font-medium text-gray-700">
+                                Select Date
+                            </label>
+                            <div class="mt-1">
+                                <input type="text" 
+                                       id="booking-date" 
+                                       name="booking_date" 
+                                       class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Time Selection -->
+                        <div>
+                            <label for="booking-time" class="block text-sm font-medium text-gray-700">
+                                Select Time
+                            </label>
+                            <div class="mt-1">
+                                <input type="text" 
+                                       id="booking-time" 
+                                       name="booking_time" 
+                                       class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                       required>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Available {{ skill.available_from|time:"g:i A" }} - {{ skill.available_to|time:"g:i A" }}
+                            </p>
+                        </div>
+
+                        <!-- Duration Selection -->
+                        <div>
+                            <label for="duration" class="block text-sm font-medium text-gray-700">
+                                Duration
+                            </label>
+                            <div class="mt-1">
+                                <select id="duration" 
+                                        name="duration" 
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                        required>
+                                    {% for i in "12345678"|make_list %}
+                                        {% if forloop.counter >= skill.min_hours and forloop.counter <= skill.max_hours %}
+                                        <option value="{{ forloop.counter }}">{{ forloop.counter }} hour{{ forloop.counter|pluralize }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Minimum: {{ skill.min_hours }} hour{{ skill.min_hours|pluralize }}, 
+                                Maximum: {{ skill.max_hours }} hour{{ skill.max_hours|pluralize }}
+                            </p>
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            <label for="notes" class="block text-sm font-medium text-gray-700">
+                                Notes (optional)
+                            </label>
+                            <div class="mt-1">
+                                <textarea id="notes" 
+                                         name="notes" 
+                                         rows="3" 
+                                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                         placeholder="Any special requirements or notes for the provider?"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Price Calculation -->
+                        <div class="rounded-md bg-gray-50 p-4">
+                            <div class="flex justify-between">
+                                <span class="text-sm font-medium text-gray-500">Rate per hour:</span>
+                                <span class="text-sm text-gray-900">R{{ skill.hourly_rate }}</span>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span class="text-sm font-medium text-gray-500">Duration:</span>
+                                <span class="text-sm text-gray-900" id="durationText">1 hour</span>
+                            </div>
+                            <div class="flex justify-between mt-1 font-semibold">
+                                <span class="text-sm text-gray-900">Total:</span>
+                                <span class="text-sm text-gray-900" id="totalPrice">R{{ skill.hourly_rate }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <button type="submit" 
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                Proceed to Payment
+                            </button>
+                            <button type="button" 
+                                    onclick="closeBookingModal()"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Pass data from Django to JavaScript
+    window.skillData = {
+        availableDays: {{ skill.get_available_days_list|safe }},
+        availableFrom: "{{ skill.available_from|time:'H:i' }}",
+        availableTo: "{{ skill.available_to|time:'H:i' }}",
+        hourlyRate: {{ skill.hourly_rate }},
+        unavailableSlots: [
+            {% for slot in skill.unavailable_slots.all %}
+            {
+                from: "{{ slot.start_time|date:'Y-m-d' }}",
+                to: "{{ slot.end_time|date:'Y-m-d' }}"
+            },
+            {% endfor %}
+        ]
+    };
+</script>
+<script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}

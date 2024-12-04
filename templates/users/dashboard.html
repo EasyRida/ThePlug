@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Welcome Section -->
+    <div class="bg-white shadow sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <h1 class="text-2xl font-bold text-gray-900">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+            <p class="mt-1 text-sm text-gray-500">
+                Here's an overview of your activity on SkillRentals.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Recent Bookings -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h2 class="text-lg font-medium text-gray-900">Recent Bookings</h2>
+                <div class="mt-4 flow-root">
+                    <div class="-my-5 divide-y divide-gray-200">
+                        {% for booking in recent_bookings %}
+                        <div class="py-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    {% if booking.skill.images.first %}
+                                    <img class="h-8 w-8 rounded-full" src="{{ booking.skill.images.first.image.url }}" alt="">
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">
+                                        {{ booking.skill.title }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ booking.start_time|date:"M d, Y" }} at {{ booking.start_time|time:"g:i A" }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                        {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ booking.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-sm text-gray-500 py-4">No recent bookings.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if recent_bookings %}
+                <div class="mt-6">
+                    <a href="{% url 'bookings:list' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        View all bookings <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Provided -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-900">Your Skills</h2>
+                    <a href="{% url 'skills:create' %}" 
+                       class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Add Skill
+                    </a>
+                </div>
+                <div class="mt-4 flow-root">
+                    <div class="-my-5 divide-y divide-gray-200">
+                        {% for skill in provided_skills %}
+                        <div class="py-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    {% if skill.images.first %}
+                                    <img class="h-8 w-8 rounded-full" src="{{ skill.images.first.image.url }}" alt="">
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">
+                                        {{ skill.title }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        ${{ skill.hourly_rate }}/hr
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="{% url 'skills:update' skill.id %}" 
+                                       class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-sm text-gray-500 py-4">No skills listed yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        {% if recent_reviews %}
+        <div class="bg-white shadow sm:rounded-lg lg:col-span-2">
+            <div class="px-4 py-5 sm:p-6">
+                <h2 class="text-lg font-medium text-gray-900">Recent Reviews</h2>
+                <div class="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {% for review in recent_reviews %}
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center">
+                            <img class="h-8 w-8 rounded-full" 
+                                 src="{{ review.reviewer.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                                 alt="">
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+                                </p>
+                                <div class="flex items-center">
+                                    {% for i in "12345" %}
+                                    <svg class="{% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %} h-4 w-4" 
+                                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">{{ review.comment|truncatechars:100 }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

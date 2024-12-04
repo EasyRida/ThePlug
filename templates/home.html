@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}SkillRentals - Learn & Hire Professionals{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="max-container py-16 md:py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="hero-content animate-fade-in">
+                <h1 class="hero-title">
+                    Transform Your Skills<br>
+                    <span class="text-primary-600">Empower Your Future</span>
+                </h1>
+                <p class="hero-description">
+                    Whether you want to learn from experts or hire professionals,
+                    SkillRentals connects you with the right people for your needs.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'skills:list' %}?type=learning" class="btn-primary">
+                        Start Learning
+                    </a>
+                    <a href="{% url 'skills:list' %}?type=services" class="btn-secondary">
+                        Find Professionals
+                    </a>
+                </div>
+            </div>
+            <div class="relative animate-fade-in delay-300">
+                <img src="{% static 'images/hero.jpg' %}" alt="Learning and Professional Services" 
+                     class="rounded-2xl shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-transparent rounded-2xl"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="bg-gray-50 py-16">
+    <div class="max-container">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Explore Categories</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Discover a wide range of skills to learn and professional services to hire
+            </p>
+        </div>
+
+        <div class="category-grid">
+            {% for category in categories %}
+            <div class="category-card animate-fade-in delay-{{ forloop.counter|multiply:100 }}">
+                <i class="{{ category.icon }} category-icon"></i>
+                <h3 class="text-xl font-semibold mb-2">{{ category.name }}</h3>
+                <p class="text-gray-600 mb-4">{{ category.description }}</p>
+                <a href="{% url 'skills:category' category.id %}" class="btn-primary">
+                    {% if category.type == 'learning' %}Start Learning{% else %}Find Services{% endif %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Skills Section -->
+<section class="py-16">
+    <div class="max-container">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Featured Skills & Services</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Popular skills and services from our top-rated providers
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for skill in featured_skills %}
+            <div class="skill-card animate-fade-in delay-{{ forloop.counter|multiply:100 }}">
+                {% if skill.images.first %}
+                <img src="{{ skill.images.first.image.url }}" alt="{{ skill.title }}" class="skill-image">
+                {% endif %}
+                <div class="skill-content">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-semibold">{{ skill.title }}</h3>
+                        <span class="px-3 py-1 rounded-full text-sm font-medium 
+                                   {% if skill.type == 'learning' %}bg-primary-100 text-primary-800
+                                   {% else %}bg-secondary-100 text-secondary-800{% endif %}">
+                            {{ skill.type|title }}
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-4">{{ skill.description|truncatewords:20 }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold text-primary-600">R{{ skill.hourly_rate }}/hr</span>
+                        <a href="{% url 'skills:detail' skill.id %}" class="btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-gray-50 py-16">
+    <div class="max-container">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">How It Works</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Get started with SkillRentals in three simple steps
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="feature-card animate-fade-in delay-100">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto bg-primary-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-2xl text-primary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Browse</h3>
+                    <p class="text-gray-600">Find the perfect skill or service that matches your needs</p>
+                </div>
+            </div>
+            <div class="feature-card animate-fade-in delay-200">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto bg-primary-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-check text-2xl text-primary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Book</h3>
+                    <p class="text-gray-600">Schedule your learning session or service appointment</p>
+                </div>
+            </div>
+            <div class="feature-card animate-fade-in delay-300">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto bg-primary-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-star text-2xl text-primary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Experience</h3>
+                    <p class="text-gray-600">Learn new skills or get professional services from experts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

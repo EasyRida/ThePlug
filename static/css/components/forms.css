@@ -1,0 +1,147 @@
+/* Form Layout */
+.form-container {
+  @apply max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8;
+}
+
+.form-header {
+  @apply text-center mb-12;
+}
+
+.form-title {
+  @apply text-3xl font-extrabold text-gray-900 sm:text-4xl;
+  background: linear-gradient(to right, #4F46E5, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-subtitle {
+  @apply mt-4 text-xl text-gray-600 max-w-2xl mx-auto;
+}
+
+/* Form Sections */
+.form-section {
+  @apply bg-white rounded-xl shadow-md overflow-hidden mb-8 transition-shadow duration-300 hover:shadow-lg;
+}
+
+.form-section-header {
+  @apply px-6 py-4 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-200;
+}
+
+.form-section-title {
+  @apply text-lg font-semibold text-gray-900 flex items-center;
+}
+
+.form-section-title svg {
+  @apply w-5 h-5 mr-2 text-indigo-600;
+}
+
+.form-section-content {
+  @apply p-6 space-y-6;
+}
+
+/* Form Controls */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-input {
+  @apply block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200;
+}
+
+.form-input:hover {
+  @apply border-indigo-300;
+}
+
+.form-textarea {
+  @apply block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200;
+  min-height: 120px;
+}
+
+.form-select {
+  @apply block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200;
+}
+
+/* Checkboxes and Radio Buttons */
+.form-checkbox-group {
+  @apply space-y-2;
+}
+
+.form-checkbox-item {
+  @apply relative flex items-center;
+}
+
+.form-checkbox {
+  @apply h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 transition-colors duration-200;
+}
+
+.form-checkbox-label {
+  @apply ml-3 text-sm text-gray-700;
+}
+
+/* Image Upload */
+.image-upload {
+  @apply mt-2 flex justify-center px-6 py-8 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-indigo-500 transition-colors duration-200;
+}
+
+.image-upload-content {
+  @apply text-center space-y-3;
+}
+
+.image-upload-icon {
+  @apply mx-auto h-12 w-12 text-gray-400;
+}
+
+.image-upload-text {
+  @apply text-sm text-gray-600;
+}
+
+.image-upload-help {
+  @apply text-xs text-gray-500;
+}
+
+/* Preview Grid */
+.preview-grid {
+  @apply mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3;
+}
+
+.preview-item {
+  @apply relative rounded-lg overflow-hidden group;
+}
+
+.preview-image {
+  @apply h-32 w-full object-cover;
+}
+
+.preview-overlay {
+  @apply absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200;
+}
+
+/* Form Actions */
+.form-actions {
+  @apply flex justify-end space-x-4 mt-8;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200;
+}
+
+/* Validation States */
+.form-error {
+  @apply mt-2 text-sm text-red-600;
+}
+
+.input-error {
+  @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.input-success {
+  @apply border-green-300 text-green-900 placeholder-green-300 focus:ring-green-500 focus:border-green-500;
+}

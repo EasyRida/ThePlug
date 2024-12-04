@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancel Booking - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Cancel Booking
+            </h3>
+            <div class="mt-2 max-w-xl text-sm text-gray-500">
+                <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+            </div>
+            <div class="mt-5">
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                        Confirm Cancellation
+                    </button>
+                    <a href="{% url 'bookings:detail' booking.id %}"
+                       class="ml-3 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">
+                        Keep Booking
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

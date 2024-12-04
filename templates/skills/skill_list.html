@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_type == 'learning' %}Learn Skills{% else %}Find Services{% endif %} - ExpertsHub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-to-r from-indigo-50 to-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+                {% if current_type == 'learning' %}
+                    Discover New Skills
+                {% else %}
+                    Find Expert Services
+                {% endif %}
+            </h1>
+            <p class="mt-4 text-xl text-gray-600">
+                {% if current_type == 'learning' %}
+                    Learn from industry experts and master new skills
+                {% else %}
+                    Connect with top professionals for your needs
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar sticky top-0 z-40 bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <form id="filter-form" class="flex flex-wrap items-center gap-4">
+            <!-- Search -->
+            <div class="flex-1 min-w-[200px]">
+                <input type="text" 
+                       id="search-input"
+                       name="search" 
+                       placeholder="Search skills..."
+                       class="search-input w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <!-- Categories -->
+            <div class="flex flex-wrap gap-2">
+                {% for category in categories %}
+                <button type="button" 
+                        data-filter="category"
+                        data-category="{{ category.id }}"
+                        class="filter-chip {% if category.id == current_category.id %}active{% endif %}">
+                    <i class="{{ category.icon }} mr-2"></i>
+                    {{ category.name }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Price Range -->
+            <div class="flex items-center gap-2">
+                <input type="range" 
+                       id="price-range"
+                       name="max_price" 
+                       min="0" 
+                       max="1000" 
+                       step="50"
+                       class="price-range-slider">
+                <span id="price-display" class="text-sm font-medium text-gray-700">R500</span>
+            </div>
+
+            <!-- Location/Remote Toggle -->
+            <div class="flex items-center gap-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" 
+                           name="remote" 
+                           class="form-checkbox h-4 w-4 text-indigo-600">
+                    <span class="ml-2 text-sm text-gray-700">Remote Only</span>
+                </label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Skills Grid -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for skill in skills %}
+        <article class="skill-card">
+            <div class="relative">
+                {% if skill.images.first %}
+                <img src="{{ skill.images.first.image.url }}" 
+                     alt="{{ skill.title }}" 
+                     class="skill-image">
+                {% else %}
+                <div class="skill-image bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-image text-4xl text-gray-400"></i>
+                </div>
+                {% endif %}
+                <span class="absolute top-4 right-4 skill-badge {{ skill.type }}">
+                    {{ skill.type|title }}
+                </span>
+            </div>
+            
+            <div class="skill-content">
+                <h2 class="text-xl font-bold text-gray-900 mb-2">{{ skill.title }}</h2>
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ skill.description }}</p>
+                
+                <div class="flex items-center mb-4">
+                    {% if skill.provider.profile_picture %}
+                    <img src="{{ skill.provider.profile_picture.url }}" 
+                         alt="{{ skill.provider.get_full_name }}"
+                         class="w-10 h-10 rounded-full object-cover">
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <span class="text-sm font-medium text-indigo-700">
+                            {{ skill.provider.get_initials }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">{{ skill.provider.get_full_name }}</p>
+                        <p class="text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            {{ skill.location }}
+                            {% if skill.is_remote %}
+                            <span class="ml-2 text-green-600">• Remote Available</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div class="text-gray-900">
+                        <span class="text-2xl font-bold">R{{ skill.hourly_rate }}</span>
+                        <span class="text-sm text-gray-500">/hour</span>
+                    </div>
+                    <a href="{% url 'skills:detail' skill.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="col-span-full flex flex-col items-center justify-center py-12">
+            <img src="{% static 'images/no-results.svg' %}" alt="No results" class="w-48 mb-6">
+            <h3 class="text-xl font-medium text-gray-900 mb-2">No results found</h3>
+            <p class="text-gray-600">Try adjusting your filters or search terms</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8">
+        <nav class="flex justify-center">
+            <ul class="flex items-center space-x-2">
+                {% if page_obj.has_previous %}
+                <li>
+                    <a href="?page={{ page_obj.previous_page_number }}" 
+                       class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                <li>
+                    <a href="?page={{ num }}" 
+                       class="px-3 py-2 rounded-md text-sm font-medium {% if page_obj.number == num %}bg-indigo-600 text-white{% else %}text-gray-700 bg-white hover:bg-gray-50{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li>
+                    <a href="?page={{ page_obj.next_page_number }}" 
+                       class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="{% static 'js/skills.js' %}"></script>
+{% endblock %}

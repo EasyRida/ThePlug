@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Share Your{% endif %} Skill - SkillRentals{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/components/forms.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h1 class="form-title">
+            {% if form.instance.pk %}Edit Your{% else %}Share Your{% endif %} Expertise
+        </h1>
+        <p class="form-subtitle">
+            Whether you want to teach skills or offer professional services, we'll help you connect with the right people.
+        </p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8" id="skillForm">
+        {% csrf_token %}
+
+        <!-- Type Selection -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h3 class="form-section-title">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    What would you like to offer?
+                </h3>
+            </div>
+            <div class="form-section-content">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="relative">
+                        <input type="radio" id="type_learning" name="offering_type" value="learning" 
+                               class="peer sr-only" {% if not form.instance.pk or form.instance.category.type == 'learning' %}checked{% endif %}>
+                        <label for="type_learning" 
+                               class="flex flex-col h-full p-6 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-indigo-500 peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500">
+                            <div class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg mb-4">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-lg font-medium text-gray-900">Teach a Skill</span>
+                                <p class="mt-1 text-sm text-gray-500">Share your knowledge and help others learn</p>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="radio" id="type_services" name="offering_type" value="services" 
+                               class="peer sr-only" {% if form.instance.pk and form.instance.category.type == 'services' %}checked{% endif %}>
+                        <label for="type_services" 
+                               class="flex flex-col h-full p-6 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-indigo-500 peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500">
+                            <div class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg mb-4">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-lg font-medium text-gray-900">Offer Services</span>
+                                <p class="mt-1 text-sm text-gray-500">Provide professional services to clients</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <h3 class="form-section-title">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Basic Information
+                </h3>
+            </div>
+            <div class="form-section-content">
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        <span class="learning-text">What skill will you teach?</span>
+                        <span class="services-text hidden">What service do you offer?</span>
+                    </label>
+                    <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}"
+                           class="form-input"
+                           placeholder="e.g., Web Development, Piano Lessons, Plumbing Services"
+                           value="{{ form.title.value|default:'' }}">
+                    {% if form.title.errors %}
+                        <p class="form-error">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                    <select name="{{ form.category.name }}" id="{{ form.category.id_for_label }}" class="form-select">
+                        <optgroup label="Learning Skills" class="learning-categories">
+                            {% for category in form.category.field.queryset %}
+                                {% if category.type == 'learning' %}
+                                    <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Professional Services" class="services-categories">
+                            {% for category in form.category.field.queryset %}
+                                {% if category.type == 'services' %}
+                                    <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                    {% if form.category.errors %}
+                        <p class="form-error">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}"
+                              class="form-textarea"
+                              placeholder="Describe what you offer, your experience, and what clients can expect...">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <p class="form-error">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Rest of the form sections remain the same -->
+        {{ form|safe }}
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'skills:list' %}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">
+                {% if form.instance.pk %}Update{% else %}Create{% endif %}
+                <span class="learning-text">Skill</span>
+                <span class="services-text hidden">Service</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Type selection handling
+    const typeRadios = document.querySelectorAll('input[name="offering_type"]');
+    const learningTexts = document.querySelectorAll('.learning-text');
+    const servicesTexts = document.querySelectorAll('.services-text');
+    const categorySelect = document.querySelector('#{{ form.category.id_for_label }}');
+    
+    function updateFormType(type) {
+        if (type === 'learning') {
+            learningTexts.forEach(el => el.classList.remove('hidden'));
+            servicesTexts.forEach(el => el.classList.add('hidden'));
+            categorySelect.querySelector('.learning-categories').disabled = false;
+            categorySelect.querySelector('.services-categories').disabled = true;
+        } else {
+            learningTexts.forEach(el => el.classList.add('hidden'));
+            servicesTexts.forEach(el => el.classList.remove('hidden'));
+            categorySelect.querySelector('.learning-categories').disabled = true;
+            categorySelect.querySelector('.services-categories').disabled = false;
+        }
+    }
+
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            updateFormType(e.target.value);
+        });
+    });
+
+    // Initialize form type
+    updateFormType(document.querySelector('input[name="offering_type"]:checked').value);
+
+    // File upload preview functionality
+    const fileInput = document.querySelector('input[type="file"]');
+    const previewContainer = document.querySelector('.preview-grid') || document.createElement('div');
+    
+    if (!document.querySelector('.preview-grid')) {
+        previewContainer.className = 'preview-grid';
+        fileInput.parentElement.parentElement.parentElement.parentElement.appendChild(previewContainer);
+    }
+
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const preview = document.createElement('div');
+                preview.className = 'preview-item';
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview" class="preview-image">
+                    <div class="preview-overlay">
+                        <button type="button" class="text-white hover:text-red-500 transition-colors">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                previewContainer.appendChild(preview);
+            }
+            
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <!-- Profile Information -->
+        <div class="md:col-span-1">
+            <div class="px-4 sm:px-0">
+                <div class="text-center">
+                    {% if user.profile_picture and user.profile_picture.url %}
+                        <img class="h-32 w-32 rounded-full mx-auto object-cover" 
+                             src="{{ user.profile_picture.url }}" 
+                             alt="{{ user.get_full_name|default:user.username }}">
+                    {% else %}
+                        <div class="h-32 w-32 rounded-full mx-auto bg-indigo-600 flex items-center justify-center text-white text-2xl">
+                            {{ user.get_initials|default:user.email.0|upper }}
+                        </div>
+                    {% endif %}
+                    <h2 class="mt-4 text-2xl font-bold text-gray-900">
+                        {{ user.get_full_name|default:user.username }}
+                    </h2>
+                    <p class="text-sm text-gray-500">{{ user.email }}</p>
+                    <p class="mt-1 text-sm text-gray-500">{{ user.location }}</p>
+                    <a href="{% url 'users:profile-edit' %}" 
+                       class="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <div class="bg-white shadow sm:rounded-lg">
+                <!-- Bio -->
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">About</h3>
+                    <div class="mt-2 text-sm text-gray-500">
+                        {{ user.bio|linebreaks|default:"No bio provided yet." }}
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                {% if skills %}
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Skills Offered</h3>
+                    <div class="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {% for skill in skills %}
+                        <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400">
+                            <div class="flex items-center space-x-3">
+                                {% if skill.images.first %}
+                                <div class="flex-shrink-0">
+                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ skill.images.first.image.url }}" alt="">
+                                </div>
+                                {% endif %}
+                                <div class="flex-1 min-w-0">
+                                    <a href="{% url 'skills:detail' skill.id %}" class="focus:outline-none">
+                                        <p class="text-sm font-medium text-gray-900">{{ skill.title }}</p>
+                                        <p class="text-sm text-gray-500 truncate">${{ skill.hourly_rate }}/hr</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Reviews -->
+                {% if reviews %}
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Recent Reviews</h3>
+                    <div class="mt-2 space-y-4">
+                        {% for review in reviews %}
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                            <div class="flex items-center">
+                                {% if review.reviewer.profile_picture and review.reviewer.profile_picture.url %}
+                                    <img class="h-8 w-8 rounded-full object-cover" 
+                                         src="{{ review.reviewer.profile_picture.url }}" 
+                                         alt="{{ review.reviewer.get_full_name|default:review.reviewer.username }}">
+                                {% else %}
+                                    <div class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                                        {{ review.reviewer.get_initials|default:review.reviewer.email.0|upper }}
+                                    </div>
+                                {% endif %}
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+                                    </p>
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                        <svg class="{% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %} h-4 w-4" 
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

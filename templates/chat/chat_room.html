@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat - SkillRentals{% endblock %}
+
+{% block extra_css %}
+<style>
+    .messages-container {
+        height: calc(100vh - 300px);
+        overflow-y: auto;
+    }
+    .message-bubble {
+        max-width: 70%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <!-- Chat header -->
+            <div class="border-b pb-4 mb-4">
+                {% for participant in chat_room.participants.all %}
+                    {% if participant != user %}
+                    <div class="flex items-center">
+                        <img class="h-10 w-10 rounded-full" 
+                             src="{{ participant.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                             alt="{{ participant.username }}">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ participant.get_full_name|default:participant.username }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Messages container -->
+            <div class="messages-container" id="messages">
+                {% for message in messages %}
+                <div class="mb-4 {% if message.sender == user %}flex justify-end{% endif %}">
+                    <div class="message-bubble {% if message.sender == user %}bg-indigo-100{% else %}bg-gray-100{% endif %} rounded-lg px-4 py-2">
+                        <p class="text-sm text-gray-900">{{ message.content }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ message.created_at|date:"g:i A" }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Message input -->
+            <div class="mt-4">
+                <form id="chat-form" class="flex space-x-3">
+                    <input type="text" 
+                           id="message-input"
+                           class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-md sm:text-sm border-gray-300"
+                           placeholder="Type a message...">
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const roomId = {{ chat_room.id }};
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messages = document.getElementById('messages');
+        const isCurrentUser = data.sender === '{{ user.username }}';
+        
+        const messageHtml = `
+            <div class="mb-4 ${isCurrentUser ? 'flex justify-end' : ''}">
+                <div class="message-bubble ${isCurrentUser ? 'bg-indigo-100' : 'bg-gray-100'} rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-900">${data.message}</p>
+                    <p class="text-xs text-gray-500 mt-1">${new Date().toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</p>
+                </div>
+            </div>
+        `;
+        
+        messages.insertAdjacentHTML('beforeend', messageHtml);
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    document.querySelector('#chat-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageInput = document.querySelector('#message-input');
+        const message = messageInput.value;
+        
+        if (message.trim()) {
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInput.value = '';
+        }
+    });
+
+    // Scroll to bottom on load
+    const messages = document.getElementById('messages');
+    messages.scrollTop = messages.scrollHeight;
+</script>
+{% endblock %}

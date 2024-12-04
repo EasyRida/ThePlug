@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Client Dashboard - SkillRentals{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Header Section -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-900">Welcome, {{ user.get_full_name }}</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        <i class="fas fa-coins mr-2"></i>
+                        Credits: 500
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <!-- Stats cards here -->
+            <!-- ... (rest of the stats section remains the same) ... -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Upcoming Sessions -->
+            <div class="bg-white shadow rounded-lg">
+                <!-- ... (rest of the upcoming sessions section remains the same) ... -->
+            </div>
+
+            <!-- Recommended Skills -->
+            <div class="bg-white shadow rounded-lg">
+                <!-- ... (rest of the recommended skills section remains the same) ... -->
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="mt-8">
+            <div class="bg-white shadow rounded-lg">
+                <!-- ... (rest of the recent activity section remains the same) ... -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
